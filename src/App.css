@@ -1,38 +1,116 @@
-.App {
-  text-align: center;
+body {
+  background-color: rgb(30, 30, 58);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+h1 {
   color: white;
+  margin: 0 auto;
+  font-size: 2.5vw;
+}
+h2 {
+  color: white;
+  font-size: 1.5vw;
+  margin: 0 auto;
 }
 
-.App-link {
-  color: #61dafb;
+.timer {
+  margin-top: 35px;
+  height: 100%;
+  font-weight: 500;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+button {
+  cursor: pointer;
+}
+
+.buttons {
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+button {
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border: 0;
+  display: inline-block;
+  width: 5vw;
+}
+
+label {
+  font-size: 1.3vw;
+  color: rgb(255, 255, 255);
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+
+
+
+/*settings*/
+
+.quad {
+  width: 60%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3vw;
+  padding: 0.3vw 0.5vw;
+  margin-top: 1vw;
+  cursor: pointer;
+  margin: 0.5vw auto;
+}
+
+.quad svg {
+  width: 20%;
+  justify-self: flex-start;
+}
+.quad span {
+  justify-self: flex-end;
+  width: 50%;
+  font-size: 1.2vw;
+}
+
+
+
+.slider {
+  height: 1.5vw;
+  border: 2px solid rgb(255, 255, 255);
+  border-radius: 20px;
+}
+.thumb {
+  background-color: rgba(255, 255, 255, 0.595);
+  cursor: pointer;
+  width: 1.4vw;
+  height: 1.4vw;
+  border-radius: 50%;
+}
+
+.workFor {
+  background-color: rgb(255, 45, 45);
+}
+
+.breakFor {
+  background-color: rgb(45,255,45);
+}
+
+.wordGoal {
+  background-color: rgb(45,45,255);
+}
+
+
+
+/*Audio*/
+
+.audio {
+  background-color: rgb(255, 255, 255);
+}
+
+.volume {
+  background-color: rgb(225, 0, 225);
 }
