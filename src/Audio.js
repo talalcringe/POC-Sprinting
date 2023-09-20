@@ -4,6 +4,7 @@ import PlayButton from './PlayButton';
 import PauseButton from './PauseButton';
 import { Howl } from 'howler';
 import { AudioContext } from './AudioContext';
+import ambient from './ambient.mp3';
 
 function Audio({ volume, setVolume }) {
   const { isPlaying, setIsPlaying } = useContext(AudioContext);
@@ -13,7 +14,7 @@ function Audio({ volume, setVolume }) {
   useEffect(() => {
     const initializeSound = () => {
       const newSound = new Howl({
-        src: ['/ambient.mp3'],
+        src: [ambient],
         format: ['mp3'],
         html5: true,
         loop: true,

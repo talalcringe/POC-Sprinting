@@ -44,7 +44,7 @@ function Notebook() {
           fontWeight: 'bold',
         }}
       >
-        <h2>Word Count: {wordCount}</h2>
+        <h2 style={{ color: 'rgb(225,135,0)' }}>Word Count: {wordCount}</h2>
       </div>
       <Editor
         style={{ height: '90vh' }}
