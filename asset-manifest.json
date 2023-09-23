@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/POC-Sprinting/static/css/main.c0d14b48.css",
-    "main.js": "/POC-Sprinting/static/js/main.77a1bf82.js",
+    "main.js": "/POC-Sprinting/static/js/main.32cfdc1c.js",
     "static/js/921.3813a9b5.chunk.js": "/POC-Sprinting/static/js/921.3813a9b5.chunk.js",
     "static/media/ambient.mp3": "/POC-Sprinting/static/media/ambient.2a7a35b2d0e28855de21.mp3",
     "static/media/primeicons.svg": "/POC-Sprinting/static/media/primeicons.e1441b135b3ca9ad643c.svg",
@@ -12,11 +12,11 @@
     "static/media/color.png": "/POC-Sprinting/static/media/color.6441e63a57ccc5105bad.png",
     "index.html": "/POC-Sprinting/index.html",
     "main.c0d14b48.css.map": "/POC-Sprinting/static/css/main.c0d14b48.css.map",
-    "main.77a1bf82.js.map": "/POC-Sprinting/static/js/main.77a1bf82.js.map",
+    "main.32cfdc1c.js.map": "/POC-Sprinting/static/js/main.32cfdc1c.js.map",
     "921.3813a9b5.chunk.js.map": "/POC-Sprinting/static/js/921.3813a9b5.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c0d14b48.css",
-    "static/js/main.77a1bf82.js"
+    "static/js/main.32cfdc1c.js"
   ]
 }
