@@ -23,6 +23,12 @@ function Notebook() {
     setEditorValue(e.htmlValue);
   };
 
+  useEffect(() => {
+    if (settingsInfo.showSettings) {
+      setEditorValue('');
+    }
+  }, [settingsInfo.showSettings]);
+
   const countWords = (value) => {
     const plainText = value
       ? value

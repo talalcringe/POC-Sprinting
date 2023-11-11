@@ -44,8 +44,16 @@ function App() {
             <Notebook />
           </div>
 
-          <div style={{ width: '18%' }}>
+          <div
+            style={{
+              width: '18%',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0',
+            }}
+          >
             {showSettings ? <Settings /> : showAudio ? <Audio /> : <Timer />}
+            <Audio volume={volume} setVolume={setVolume} />
           </div>
         </SettingsContext.Provider>
       </AudioProvider>
