@@ -4,7 +4,7 @@ import PlayButton from './PlayButton';
 import PauseButton from './PauseButton';
 import { Howl } from 'howler';
 import { AudioContext } from './AudioContext';
-import ambient from './ambient.mp3';
+import { storage } from './firebase.js';
 
 function Audio({ volume, setVolume }) {
   const { isPlaying, setIsPlaying } = useContext(AudioContext);
@@ -14,7 +14,7 @@ function Audio({ volume, setVolume }) {
   useEffect(() => {
     const initializeSound = () => {
       const newSound = new Howl({
-        src: [ambient],
+        src: 'https://firebasestorage.googleapis.com/v0/b/sprinting-poc.appspot.com/o/ambient.mp3?alt=media&token=90c8910c-f1f7-42f6-b02f-9ced240a763b',
         format: ['mp3'],
         html5: true,
         loop: true,
