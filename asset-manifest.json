@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/POC-Sprinting/static/css/main.1cea6a86.css",
-    "main.js": "/POC-Sprinting/static/js/main.bf2e9148.js",
+    "main.js": "/POC-Sprinting/static/js/main.bf8ffc09.js",
     "static/js/921.3813a9b5.chunk.js": "/POC-Sprinting/static/js/921.3813a9b5.chunk.js",
     "static/media/primeicons.svg": "/POC-Sprinting/static/media/primeicons.e1441b135b3ca9ad643c.svg",
     "static/media/primeicons.eot": "/POC-Sprinting/static/media/primeicons.d44157bdfa026dc877af.eot",
@@ -11,11 +11,11 @@
     "static/media/color.png": "/POC-Sprinting/static/media/color.6441e63a57ccc5105bad.png",
     "index.html": "/POC-Sprinting/index.html",
     "main.1cea6a86.css.map": "/POC-Sprinting/static/css/main.1cea6a86.css.map",
-    "main.bf2e9148.js.map": "/POC-Sprinting/static/js/main.bf2e9148.js.map",
+    "main.bf8ffc09.js.map": "/POC-Sprinting/static/js/main.bf8ffc09.js.map",
     "921.3813a9b5.chunk.js.map": "/POC-Sprinting/static/js/921.3813a9b5.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.1cea6a86.css",
-    "static/js/main.bf2e9148.js"
+    "static/js/main.bf8ffc09.js"
   ]
 }
