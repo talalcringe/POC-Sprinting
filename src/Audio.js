@@ -1,20 +1,23 @@
+// Audio.js
 import React, { useState, useRef, useContext, useEffect } from 'react';
 import ReactSlider from 'react-slider';
 import PlayButton from './PlayButton';
 import PauseButton from './PauseButton';
 import { Howl } from 'howler';
 import { AudioContext } from './AudioContext';
-import { storage } from './firebase.js';
+import AudioButton from './AudioButton';
+import AudioSettingsModal from './AudioSettingsModal';
 
 function Audio({ volume, setVolume }) {
   const { isPlaying, setIsPlaying } = useContext(AudioContext);
   const [sound, setSound] = useState(null);
   const soundRef = useRef(null);
+  const [selectedAudioUrl, setSelectedAudioUrl] = useState('');
 
   useEffect(() => {
     const initializeSound = () => {
       const newSound = new Howl({
-        src: 'https://firebasestorage.googleapis.com/v0/b/sprinting-poc.appspot.com/o/ambient.mp3?alt=media&token=90c8910c-f1f7-42f6-b02f-9ced240a763b',
+        src: [selectedAudioUrl], // Use the selected audio URL
         format: ['mp3'],
         html5: true,
         loop: true,
@@ -54,7 +57,7 @@ function Audio({ volume, setVolume }) {
         soundRef.current.unload();
       }
     };
-  }, [isPlaying, volume, setIsPlaying]);
+  }, [isPlaying, volume, setIsPlaying, selectedAudioUrl]);
 
   const handleSliderChange = (newValue) => {
     setVolume(newValue);
@@ -84,6 +87,11 @@ function Audio({ volume, setVolume }) {
           <PlayButton onClick={() => setIsPlaying(true)} />
         )}
       </div>
+      <AudioSettingsModal
+        onSelectAudio={(selectedAudioUrl) =>
+          setSelectedAudioUrl(selectedAudioUrl)
+        }
+      />
     </div>
   );
 }
