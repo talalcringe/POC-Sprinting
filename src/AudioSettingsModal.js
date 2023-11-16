@@ -1,24 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import AudioButton from './AudioButton';
+import { storage } from './firebase';
+import { ref, uploadBytes, listAll, getDownloadURL } from 'firebase/storage';
+import { v4 } from 'uuid';
 
 const AudioSettingsModal = ({ onSelectAudio }) => {
   const [showModal, setShowModal] = useState(false);
-  const [selectedAudio, setSelectedAudio] = useState('ambient');
+  const [selectedAudio, setSelectedAudio] = useState(null); // Change default value to null
 
-  const audioUrls = {
-    ambient:
-      'https://firebasestorage.googleapis.com/v0/b/sprinting-poc.appspot.com/o/ambient.mp3?alt=media&token=90c8910c-f1f7-42f6-b02f-9ced240a763b',
-    forest:
-      'https://firebasestorage.googleapis.com/v0/b/sprinting-poc.appspot.com/o/forest.mp3?alt=media&token=ff804c0b-aea4-4cfc-a93e-e5ac1ee8a70b',
-    ocean:
-      'https://firebasestorage.googleapis.com/v0/b/sprinting-poc.appspot.com/o/ocean.mp3?alt=media&token=7a386e9a-bc25-4271-993e-9a86d4ff985b',
-  };
+  const [audioUpload, setAudioUpload] = useState(null);
+  const [audioList, setAudioList] = useState([]);
 
-  const handleAudioSelection = (audioType) => {
-    setSelectedAudio(audioType);
-    setShowModal(false);
-    onSelectAudio(audioUrls[audioType]);
+  const audioListRef = ref(storage, 'audio/');
+
+  const handleAudioSelection = (audioInfo) => {
+    setSelectedAudio(audioInfo.name === selectedAudio ? null : audioInfo.name);
+    onSelectAudio(audioInfo.url);
   };
 
   const handleShowModal = () => {
@@ -28,6 +26,33 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
   const handleCloseModal = () => {
     setShowModal(false);
   };
+
+  const uploadAudio = () => {
+    if (audioUpload == null) return;
+    const audioRef = ref(storage, `audio/${audioUpload.name + v4()}`);
+    uploadBytes(audioRef, audioUpload).then(() => {
+      alert('Audio uploaded');
+    });
+  };
+
+  useEffect(() => {
+    listAll(audioListRef)
+      .then((response) => {
+        const promises = response.items.map(async (item) => {
+          const url = await getDownloadURL(item);
+          const fileNameWithoutExtension = item.name.replace(/\.[^/.]+$/, ''); // Remove extension
+          return { name: fileNameWithoutExtension, url };
+        });
+
+        return Promise.all(promises);
+      })
+      .then((audioInfoArray) => {
+        setAudioList(audioInfoArray);
+      })
+      .catch((error) => {
+        console.error('Error fetching audio URLs: ', error);
+      });
+  }, []);
 
   return (
     <>
@@ -60,43 +85,52 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
           className='audio-selection'
           style={{ textAlign: 'center', margin: '5vw auto' }}
         >
-          <button
-            onClick={() => handleAudioSelection('ambient')}
-            className={`button ${selectedAudio === 'ambient' ? 'active' : ''}`}
+          {audioList.map((audioInfo) => (
+            <button
+              key={audioInfo.name}
+              onClick={() => handleAudioSelection(audioInfo)}
+              className={`button ${
+                selectedAudio === audioInfo.name ? 'active' : ''
+              }`}
+              style={{
+                backgroundColor: '#2ecc71',
+                border:
+                  selectedAudio === audioInfo.name ? '4px white solid' : 'none',
+                padding: selectedAudio === audioInfo.name ? '1vw' : '0.5vw',
+                margin: '0.5vw',
+                minWidth: 'max-content',
+              }}
+            >
+              {audioInfo.name}
+            </button>
+          ))}
+        </div>
+        <div
+          className='audio-upload'
+          style={{
+            textAlign: 'center',
+          }}
+        >
+          <input
+            type='file'
+            onChange={(event) => setAudioUpload(event.target.files[0])}
             style={{
-              backgroundColor: '#2ecc71',
-              padding: selectedAudio === 'ambient' ? '1vw' : '0.5vw',
+              padding: '1vw',
+              margin: '0.5vw, auto',
+              minWidth: 'max-content',
+            }}
+          />
+          <button
+            onClick={uploadAudio}
+            style={{
+              color: 'white',
+              backgroundColor: 'black',
+              padding: '1vw',
               margin: '0.5vw',
               minWidth: 'max-content',
             }}
           >
-            Ambient
-          </button>
-
-          <button
-            onClick={() => handleAudioSelection('forest')}
-            className={`button ${selectedAudio === 'forest' ? 'active' : ''}`}
-            style={{
-              backgroundColor: '#e74c3c',
-              padding: selectedAudio === 'forest' ? '1vw' : '0.5vw',
-              margin: '0.5vw',
-              minWidth: 'max-content',
-            }}
-          >
-            Forest
-          </button>
-
-          <button
-            onClick={() => handleAudioSelection('ocean')}
-            className={`button ${selectedAudio === 'ocean' ? 'active' : ''}`}
-            style={{
-              backgroundColor: '#f39c12',
-              padding: selectedAudio === 'ocean' ? '1vw' : '0.5vw',
-              margin: '0.5vw',
-              minWidth: 'max-content',
-            }}
-          >
-            Ocean
+            Upload Audio
           </button>
         </div>
       </Modal>
