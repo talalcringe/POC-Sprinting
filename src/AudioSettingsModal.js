@@ -11,9 +11,9 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
   const [selectedAudio, setSelectedAudio] = useState(null);
   const [audioUpload, setAudioUpload] = useState(null);
   const [audioList, setAudioList] = useState([]);
-  const [pixabayResults, setPixabayResults] = useState([]);
+  const [freesoundResults, setFreesoundResults] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [previewPixabayAudio, setPreviewPixabayAudio] = useState(null);
+  const [previewFreesoundAudio, setPreviewFreesoundAudio] = useState(null);
 
   const audioListRef = ref(storage, 'audio/');
 
@@ -38,39 +38,33 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
     });
   };
 
-  const searchPixabayAudio = async () => {
+  const searchFreesoundAudio = async () => {
     try {
-      const apiKey = '40625015-ab19160267bc0cdaa73bd5e00'; // Replace with your Pixabay API key
-      const response = await axios.get('https://pixabay.com/api/', {
-        params: {
-          key: apiKey,
-          q: searchQuery,
-          category: 'music',
-          per_page: 10,
-          video_type: 'animation',
-        },
-      });
+      const apiKey = 'MapqUvbtruxt9yDY3UTnL9SQISAkmHXOm3RKNIBU'; // Replace with your Freesound API key
+      const response = await axios.get(
+        `https://freesound.org/apiv2/search/text/?query=${searchQuery}&token=${apiKey}`
+      );
 
-      const pixabayResultsData = response.data;
+      const freesoundResultsData = response.data;
 
-      console.log('Pixabay API response:', pixabayResultsData);
+      console.log('Freesound API response:', freesoundResultsData);
 
-      if (pixabayResultsData.totalHits === 0) {
-        console.log('No Pixabay audio found.');
-        setPixabayResults([]);
+      if (freesoundResultsData.count === 0) {
+        console.log('No Freesound audio found.');
+        setFreesoundResults([]);
+        setPreviewFreesoundAudio(null); // Clear preview when no results
       } else {
-        const audioResults = pixabayResultsData.hits
-          .filter((hit) => hit.audio && hit.audio.mp3) // Check if 'audio' and 'mp3' properties exist
-          .map((hit) => ({
-            name: hit.tags,
-            url: hit.audio.mp3,
-          }));
+        const audioResults = freesoundResultsData.results.map((result) => ({
+          name: result.name,
+          url: result.previews && result.previews['preview-hq-mp3'],
+        }));
 
-        console.log('Pixabay audio results:', audioResults);
-        setPixabayResults(audioResults);
+        console.log('Freesound audio results:', audioResults);
+        setFreesoundResults(audioResults);
+        setPreviewFreesoundAudio(audioResults[0]?.url); // Preview the first result
       }
     } catch (error) {
-      console.error('Error fetching Pixabay audio: ', error);
+      console.error('Error fetching Freesound audio: ', error);
     }
   };
 
@@ -121,9 +115,9 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
       >
         <h2 style={{ margin: 'auto', textAlign: 'center' }}>Audio Settings</h2>
 
-        {/* Section for Pixabay audio */}
+        {/* Section for Freesound audio */}
         <div style={{ textAlign: 'center', margin: '5vw auto' }}>
-          <h3>Pixabay Audio</h3>
+          <h3>Freesound Audio</h3>
           <div
             style={{
               display: 'flex',
@@ -133,7 +127,7 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
           >
             <input
               type='text'
-              placeholder='Search Pixabay Audio'
+              placeholder='Search Freesound Audio'
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{
                 padding: '1vw',
@@ -142,7 +136,7 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
               }}
             />
             <button
-              onClick={searchPixabayAudio}
+              onClick={searchFreesoundAudio}
               style={{
                 color: 'white',
                 backgroundColor: 'black',
@@ -158,12 +152,12 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
             className='audio-selection'
             style={{ textAlign: 'center', margin: '5vw auto' }}
           >
-            {pixabayResults.map((audioInfo) => (
+            {freesoundResults.map((audioInfo) => (
               <div key={audioInfo.name} style={{ marginBottom: '1em' }}>
                 <button
                   onClick={() => {
                     handleAudioSelection(audioInfo);
-                    setPreviewPixabayAudio(audioInfo.url);
+                    setPreviewFreesoundAudio(audioInfo.url);
                   }}
                   className={`button ${
                     selectedAudio === audioInfo.name ? 'active' : ''
@@ -184,10 +178,10 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
               </div>
             ))}
           </div>
-          {previewPixabayAudio && (
+          {previewFreesoundAudio && (
             <div style={{ marginTop: '1em' }}>
               <audio controls>
-                <source src={previewPixabayAudio} type='audio/mp3' />
+                <source src={previewFreesoundAudio} type='audio/mp3' />
                 Your browser does not support the audio tag.
               </audio>
             </div>
