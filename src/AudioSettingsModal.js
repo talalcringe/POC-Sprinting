@@ -13,7 +13,7 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
   const [audioList, setAudioList] = useState([]);
   const [freesoundResults, setFreesoundResults] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [previewFreesoundAudio, setPreviewFreesoundAudio] = useState(null);
+  const [displayedResults, setDisplayedResults] = useState(8);
 
   const audioListRef = ref(storage, 'audio/');
 
@@ -40,9 +40,9 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
 
   const searchFreesoundAudio = async () => {
     try {
-      const apiKey = 'MapqUvbtruxt9yDY3UTnL9SQISAkmHXOm3RKNIBU'; // Replace with your Freesound API key
+      const apiKey = 'MapqUvbtruxt9yDY3UTnL9SQISAkmHXOm3RKNIBU';
       const response = await axios.get(
-        `https://freesound.org/apiv2/search/text/?query=${searchQuery}&token=${apiKey}`
+        `https://freesound.org/apiv2/search/text/?query=${searchQuery}&token=${apiKey}&format=json`
       );
 
       const freesoundResultsData = response.data;
@@ -52,16 +52,27 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
       if (freesoundResultsData.count === 0) {
         console.log('No Freesound audio found.');
         setFreesoundResults([]);
-        setPreviewFreesoundAudio(null); // Clear preview when no results
       } else {
-        const audioResults = freesoundResultsData.results.map((result) => ({
-          name: result.name,
-          url: result.previews && result.previews['preview-hq-mp3'],
-        }));
+        const soundInfoPromises = freesoundResultsData.results.map(
+          async (result) => {
+            const soundInfoResponse = await axios.get(
+              `https://freesound.org/apiv2/sounds/${result.id}/?token=${apiKey}&format=json`
+            );
+
+            const soundInfo = soundInfoResponse.data;
+            return {
+              name: soundInfo.name,
+              url: soundInfo.previews
+                ? soundInfo.previews['preview-hq-mp3']
+                : null,
+            };
+          }
+        );
+
+        const audioResults = await Promise.all(soundInfoPromises);
 
         console.log('Freesound audio results:', audioResults);
         setFreesoundResults(audioResults);
-        setPreviewFreesoundAudio(audioResults[0]?.url); // Preview the first result
       }
     } catch (error) {
       console.error('Error fetching Freesound audio: ', error);
@@ -73,7 +84,7 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
       .then((response) => {
         const promises = response.items.map(async (item) => {
           const url = await getDownloadURL(item);
-          const fileNameWithoutExtension = item.name.replace(/\.[^/.]+$/, ''); // Remove extension
+          const fileNameWithoutExtension = item.name.replace(/\.[^/.]+$/, '');
           return { name: fileNameWithoutExtension, url };
         });
 
@@ -86,6 +97,51 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
         console.error('Error fetching audio URLs: ', error);
       });
   }, []);
+
+  const loadMoreResults = async () => {
+    try {
+      const apiKey = 'MapqUvbtruxt9yDY3UTnL9SQISAkmHXOm3RKNIBU';
+      const nextPage = Math.ceil(displayedResults / 10) + 1;
+
+      const response = await axios.get(
+        'https://freesound.org/apiv2/search/text/',
+        {
+          params: {
+            query: searchQuery,
+            token: apiKey,
+            page_size: 10,
+            page: nextPage,
+          },
+        }
+      );
+
+      const additionalResults = response.data.results;
+
+      if (additionalResults.length === 0) {
+        console.log('No additional Freesound audio found.');
+        return;
+      }
+
+      const soundInfoPromises = additionalResults.map(async (result) => {
+        const soundInfoResponse = await axios.get(
+          `https://freesound.org/apiv2/sounds/${result.id}/?token=${apiKey}&format=json`
+        );
+
+        const soundInfo = soundInfoResponse.data;
+        return {
+          name: soundInfo.name,
+          url: soundInfo.previews ? soundInfo.previews['preview-hq-mp3'] : null,
+        };
+      });
+
+      const newResults = await Promise.all(soundInfoPromises);
+
+      setFreesoundResults(newResults);
+      setDisplayedResults((prevCount) => prevCount + 10);
+    } catch (error) {
+      console.error('Error fetching additional Freesound audio: ', error);
+    }
+  };
 
   return (
     <>
@@ -125,6 +181,7 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
               justifyContent: 'center',
             }}
           >
+            {/* Search input and button */}
             <input
               type='text'
               placeholder='Search Freesound Audio'
@@ -148,17 +205,31 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
               Search
             </button>
           </div>
+
+          {/* Audio selection and load more results */}
           <div
             className='audio-selection'
-            style={{ textAlign: 'center', margin: '5vw auto' }}
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap', // Allows items to wrap to the next line
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflowX: 'auto',
+              whiteSpace: 'nowrap', // Prevents wrapping to the next line
+              margin: '5vw auto',
+            }}
           >
-            {freesoundResults.map((audioInfo) => (
-              <div key={audioInfo.name} style={{ marginBottom: '1em' }}>
+            {freesoundResults.map((audioInfo, index) => (
+              <div
+                key={audioInfo.name}
+                style={{
+                  margin: '0.5vw',
+                  flexBasis: 'calc(50% - 1vw)', // Set the flex basis to 50% with margin included
+                  boxSizing: 'border-box', // Ensure the margin is included in the width calculation
+                }}
+              >
                 <button
-                  onClick={() => {
-                    handleAudioSelection(audioInfo);
-                    setPreviewFreesoundAudio(audioInfo.url);
-                  }}
+                  onClick={() => handleAudioSelection(audioInfo)}
                   className={`button ${
                     selectedAudio === audioInfo.name ? 'active' : ''
                   }`}
@@ -169,23 +240,36 @@ const AudioSettingsModal = ({ onSelectAudio }) => {
                         ? '4px white solid'
                         : 'none',
                     padding: selectedAudio === audioInfo.name ? '1vw' : '0.5vw',
-                    margin: '0.5vw',
                     minWidth: 'max-content',
+                    width: '100%', // Ensure the button takes full width
                   }}
                 >
                   {audioInfo.name}
                 </button>
+                <div>
+                  {selectedAudio === audioInfo.name && (
+                    <audio key={audioInfo.name} controls>
+                      <source src={audioInfo.url} type='audio/mp3' />
+                      Your browser does not support the audio tag.
+                    </audio>
+                  )}
+                </div>
               </div>
             ))}
+            <button
+              onClick={loadMoreResults}
+              style={{
+                color: 'white',
+                backgroundColor: 'black',
+                padding: '1vw',
+                margin: '0.5vw',
+                minWidth: 'max-content',
+                width: '100%', // Ensure the button takes full width
+              }}
+            >
+              Load More
+            </button>
           </div>
-          {previewFreesoundAudio && (
-            <div style={{ marginTop: '1em' }}>
-              <audio controls>
-                <source src={previewFreesoundAudio} type='audio/mp3' />
-                Your browser does not support the audio tag.
-              </audio>
-            </div>
-          )}
         </div>
 
         {/* Section for Firebase audio */}
